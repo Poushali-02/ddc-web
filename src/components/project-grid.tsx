@@ -18,7 +18,7 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
             <div className="h-1 flex-1 bg-gradient-to-r from-yellow-400 to-transparent rounded"></div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid  md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}

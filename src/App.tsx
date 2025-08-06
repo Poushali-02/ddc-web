@@ -2,6 +2,7 @@ import { Search, Sun } from "lucide-react";
 import { Button } from "./components/ui/button";
 import projectsData from "./data/projects.json";
 import { ProjectGrid } from "./components/project-grid";
+import { Spotlight } from "./components/ui/spotlight-new";
 
 function App() {
   return (
@@ -48,18 +49,23 @@ function App() {
       </header>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 py-20">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <div className="inline-flex items-center px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-sm">
-              🔍 Explore More Web Development Resources
-            </div>
+      <main className="relative">
+        <div className="h-[40rem] w-full flex items-center justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
+          <Spotlight fill="#ffc600" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="text-center space-y-8">
+              <div className="space-y-4">
+                <div className="inline-flex items-center px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-sm">
+                  🔍 Explore More Web Development Resources
+                </div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold">
-              <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
-                DDC-Web Community
-              </span>
-            </h1>
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold">
+                  <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+                    DDC-Web Community
+                  </span>
+                </h1>
+              </div>
+            </div>
           </div>
         </div>
 
