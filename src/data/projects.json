@@ -1,0 +1,22 @@
+{
+  "projects": [
+    {
+      "id": "web-app-1",
+      "title": "Web Application",
+      "description": "Modern web application built with latest technologies",
+      "technologies": ["React", "Vite"]
+    },
+    {
+      "id": "ecommerce-1",
+      "title": "E-commerce Platform",
+      "description": "Full-stack e-commerce solution with payment integration",
+      "technologies": ["TypeScript", "Node.js"]
+    },
+    {
+      "id": "dashboard-1",
+      "title": "Dashboard Analytics",
+      "description": "Real-time analytics dashboard with data visualization",
+      "technologies": ["Vue.js", "D3.js"]
+    }
+  ]
+}
