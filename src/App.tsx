@@ -11,12 +11,16 @@ gsap.registerPlugin(useGSAP);
 
 
 function App() {
-  useGSAP(() =>{
-        gsap.fromTo(".main-text h1",
-            {y: 50, opacity: 0},
-            {y: 0, opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3}
-        )
-    })
+  useGSAP(() => {
+    gsap.fromTo(".main-text h1",
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
+    )
+    gsap.fromTo(".main-text p",
+      { opacity: 0 },
+      { opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
+    )
+  })
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -24,7 +28,7 @@ function App() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <a href="/" className="text-xl font-semibold text-yellow-400">
-              Realtime DDC-Web Projects Showcase
+              BuiltOnDot
             </a>
             <nav className="hidden md:flex items-center space-x-6">
               <a
@@ -66,16 +70,19 @@ function App() {
           <Spotlight fill="#ffc600" />
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center space-y-8">
-              <div className="space-y-4 main-text">
+              <div className="space-y-20 main-text">
                 <div className="inline-flex items-center px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-sm">
                   🔍 Explore More Web Development Resources
                 </div>
+                <div className="space-y-6">
+                  <h1 className="fade-on-scroll text-5xl md:text-7xl lg:text-8xl font-bold">
+                    <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+                      DDC-BuiltOnDot
+                    </span>
+                  </h1>
+                  <p className="">Discover, Read, and Celebrate What Our Community Builds.</p>
+                </div>
 
-                <h1 className="fade-on-scroll text-4xl md:text-6xl lg:text-7xl font-bold">
-                  <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
-                    DDC-Web Community
-                  </span>
-                </h1>
               </div>
             </div>
           </div>
