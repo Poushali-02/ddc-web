@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Import Your RSS Feeds</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .examples { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .domain-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+        .domain-tag { background: #e9ecef; padding: 5px 10px; border-radius: 15px; cursor: pointer; }
+        .domain-tag:hover { background: #dee2e6; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Import Your RSS Feeds</h1>
+    
+    <div class="examples">
+        <h3>📋 Popular RSS Feed Examples:</h3>
+        <ul>
+            <li><strong>Medium User:</strong> https://medium.com/feed/@username</li>
+            <li><strong>Medium Publication:</strong> https://medium.com/feed/publication-name</li>
+            <li><strong>Dev.to:</strong> https://dev.to/feed</li>
+            <li><strong>Personal Blog:</strong> https://yourblog.com/feed.xml</li>
+        </ul>
+    </div>
+    
+    <form id="rssForm">
+        <div class="form-group">
+            <label for="rssUrl">📡 RSS Feed URL:</label>
+            <input type="url" id="rssUrl" required placeholder="https://medium.com/feed/@your-username">
+        </div>
+        
+        <div class="form-group">
+            <label for="domain">🏷️ Category/Domain:</label>
+            <input type="text" id="domain" placeholder="Technology, Programming, AI, etc.">
+            <small>Leave empty to auto-detect from feed content</small>
+        </div>
+        
+        <button type="submit">📥 Import RSS Feed</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <div>
+        <h3>📊 Existing Domains in Database:</h3>
+        <div id="domains" class="domain-list"></div>
+        <button onclick="loadDomains()" style="background: #6c757d;">🔄 Refresh Domains</button>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        
+        document.getElementById('rssForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const rssUrl = document.getElementById('rssUrl').value;
+            const domain = document.getElementById('domain').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.innerHTML = '<p>🔄 Processing RSS feed...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/import-rss`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        rss_url: rssUrl,
+                        domain: domain || undefined
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h4>✅ Success!</h4>
+                            <p><strong>Processed:</strong> ${result.processed} blogs</p>
+                            <p><strong>Skipped:</strong> ${result.skipped} entries (duplicates or missing content)</p>
+                            <p><strong>Feed Title:</strong> ${result.feed_title}</p>
+                            ${result.processed > 0 ? '<p>🎉 Your blogs are now available in the system!</p>' : ''}
+                        </div>
+                    `;
+                    loadDomains(); // Refresh domains
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h4>❌ Error</h4>
+                            <p>${result.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h4>🔌 Connection Error</h4>
+                        <p>${error.message}</p>
+                        <p>Make sure the Flask server is running on http://localhost:5000</p>
+                    </div>
+                `;
+            }
+        });
+        
+        async function loadDomains() {
+            try {
+                const response = await fetch(`${API_BASE}/projects`);
+                const data = await response.json();
+                
+                const domainsDiv = document.getElementById('domains');
+                if (data.domains && data.domains.length > 0) {
+                    domainsDiv.innerHTML = data.domains.map(domain => 
+                        `<span class="domain-tag">${domain}</span>`
+                    ).join('');
+                } else {
+                    domainsDiv.innerHTML = '<p>No domains found. Import some RSS feeds first!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading domains:', error);
+            }
+        }
+        
+        // Load domains on page load
+        window.onload = loadDomains;
+    </script>
+</body>
+</html>
