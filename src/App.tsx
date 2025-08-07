@@ -3,8 +3,20 @@ import { Button } from "./components/ui/button";
 import projectsData from "./data/projects.json";
 import { ProjectGrid } from "./components/project-grid";
 import { Spotlight } from "./components/ui/spotlight-new";
+import WebpageCards from "./components/webpage-card";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
+
 
 function App() {
+  useGSAP(() =>{
+        gsap.fromTo(".main-text h1",
+            {y: 50, opacity: 0},
+            {y: 0, opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3}
+        )
+    })
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -54,12 +66,12 @@ function App() {
           <Spotlight fill="#ffc600" />
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center space-y-8">
-              <div className="space-y-4">
+              <div className="space-y-4 main-text">
                 <div className="inline-flex items-center px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-sm">
                   🔍 Explore More Web Development Resources
                 </div>
 
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold">
+                <h1 className="fade-on-scroll text-4xl md:text-6xl lg:text-7xl font-bold">
                   <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
                     DDC-Web Community
                   </span>
@@ -71,13 +83,20 @@ function App() {
 
         {/* Latest Projects Section */}
         <ProjectGrid projects={projectsData.projects} />
+
+        <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mt-10 p-6">
+          <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+            You can Connect with us on...
+          </span>
+        </h1>
+        <WebpageCards />
       </main>
 
       {/* Footer */}
       <footer className="border-t border-yellow-500/20 mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-400">
-            <p>&copy; 2024 DDC-Web Community. All rights reserved.</p>
+            <p>&copy; 2025 DDC-Web Community. All rights reserved.</p>
           </div>
         </div>
       </footer>
