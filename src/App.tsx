@@ -6,21 +6,24 @@ import { Spotlight } from "./components/ui/spotlight-new";
 import WebpageCards from "./components/webpage-card";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useNavigate } from "react-router-dom";
 
 gsap.registerPlugin(useGSAP);
 
-
 function App() {
+  const navigate = useNavigate();
   useGSAP(() => {
-    gsap.fromTo(".main-text h1",
+    gsap.fromTo(
+      ".main-text h1",
       { y: 50, opacity: 0 },
       { y: 0, opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
-    )
-    gsap.fromTo(".main-text p",
+    );
+    gsap.fromTo(
+      ".main-text p",
       { opacity: 0 },
       { opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
-    )
-  })
+    );
+  });
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -58,6 +61,13 @@ function App() {
                 >
                   <Sun className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/signIn")}
+                  className="text-gray-300 hover:text-yellow-400"
+                >
+                  Sign in
+                </Button>
               </div>
             </nav>
           </div>
@@ -67,7 +77,7 @@ function App() {
       {/* Hero Section */}
       <main className="relative">
         <div className="h-[40rem] w-full flex items-center justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
-          <Spotlight fill="#ffc600" />
+          <Spotlight />
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center space-y-8">
               <div className="space-y-20 main-text">
@@ -80,9 +90,10 @@ function App() {
                       DDC-BuiltOnDot
                     </span>
                   </h1>
-                  <p className="">Discover, Read, and Celebrate What Our Community Builds.</p>
+                  <p className="">
+                    Discover, Read, and Celebrate What Our Community Builds.
+                  </p>
                 </div>
-
               </div>
             </div>
           </div>
