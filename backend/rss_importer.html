@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Feed Importer - DDC Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .import-section {
+            padding: 40px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .preview-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-feeds {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .quick-feeds h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .quick-feed-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .quick-feed-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .status-message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .preview-content {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .blog-preview {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .blog-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .blog-domain {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .blog-content {
+            color: #555;
+            line-height: 1.6;
+            max-height: 150px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .blog-content::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(transparent, white);
+        }
+
+        .blog-link {
+            margin-top: 10px;
+        }
+
+        .blog-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .blog-link a:hover {
+            text-decoration: underline;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .auth-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .auth-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .auth-form input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .auth-form button {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .import-section {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .auth-form {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 RSS Feed Importer</h1>
+            <p>Import Medium articles and other RSS feeds directly to your blog database</p>
+        </div>
+
+        <div class="main-content">
+            <div class="import-section">
+                <!-- Authentication Section -->
+                <div class="auth-section">
+                    <h3>🔐 Authentication Required</h3>
+                    <p style="margin: 10px 0; font-size: 14px;">Please login to import RSS feeds</p>
+                    <div class="auth-form">
+                        <input type="text" id="username" placeholder="Username">
+                        <input type="password" id="password" placeholder="Password">
+                        <button onclick="login()">Login</button>
+                    </div>
+                    <div id="authStatus"></div>
+                </div>
+
+                <!-- RSS Import Form -->
+                <div class="form-group">
+                    <label for="rssUrl">📡 RSS Feed URL</label>
+                    <input type="url" id="rssUrl" placeholder="https://medium.com/feed/@username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="domain">🏷️ Domain/Topic</label>
+                    <input type="text" id="domain" placeholder="e.g., Programming, AI, Web Development">
+                </div>
+
+                <button class="btn" onclick="importRSSFeed()" id="importBtn" disabled>
+                    📥 Import RSS Feed
+                </button>
+
+                <div id="statusMessage"></div>
+
+                <!-- Quick RSS Feeds -->
+                <div class="quick-feeds">
+                    <h3>⚡ Quick Import - Popular Feeds</h3>
+                    <button class="quick-feed-btn" onclick="quickImport('https://medium.com/feed/@freecodecamp', 'Education')">
+                        🎓 freeCodeCamp - Education
+                    </button>
+                    <button class="quick-feed-btn" onclick="quickImport('https://medium.com/feed/towards-data-science', 'Data Science')">
+                        📊 Towards Data Science
+                    </button>
+                    <button class="quick-feed-btn" onclick="quickImport('https://medium.com/feed/better-programming', 'Programming')">
+                        💻 Better Programming
+                    </button>
+                    <button class="quick-feed-btn" onclick="quickImport('https://medium.com/feed/javascript-scene', 'JavaScript')">
+                        🟨 JavaScript Scene
+                    </button>
+                    <button class="quick-feed-btn" onclick="quickImport('https://medium.com/feed/devdotcom', 'Development')">
+                        🔧 DevDotCom
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h3>📊 Import Results</h3>
+                
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-number" id="processedCount">0</div>
+                        <div class="stat-label">Processed</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="skippedCount">0</div>
+                        <div class="stat-label">Skipped</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalCount">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+
+                <div class="preview-content" id="previewContent">
+                    <div style="text-align: center; color: #666; padding: 50px;">
+                        <h4>🎯 Ready to Import</h4>
+                        <p>Enter an RSS URL and click "Import RSS Feed" to see the results here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let authToken = localStorage.getItem('authToken');
+
+        // Check if user is already logged in
+        if (authToken) {
+            document.getElementById('importBtn').disabled = false;
+            document.getElementById('authStatus').innerHTML = '<p style="color: green; margin-top: 10px;">✅ Logged in successfully</p>';
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showAuthStatus('Please enter username and password', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', authToken);
+                    document.getElementById('importBtn').disabled = false;
+                    showAuthStatus(`Welcome, ${data.user.username}! ✅`, 'success');
+                    
+                    // Clear form
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    showAuthStatus(data.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showAuthStatus('Network error. Make sure Django server is running.', 'error');
+            }
+        }
+
+        function showAuthStatus(message, type) {
+            const authStatus = document.getElementById('authStatus');
+            authStatus.innerHTML = `<p style="color: ${type === 'success' ? 'green' : 'red'}; margin-top: 10px;">${message}</p>`;
+        }
+
+        function quickImport(url, domain) {
+            document.getElementById('rssUrl').value = url;
+            document.getElementById('domain').value = domain;
+        }
+
+        async function importRSSFeed() {
+            const rssUrl = document.getElementById('rssUrl').value;
+            const domain = document.getElementById('domain').value || 'General';
+
+            if (!rssUrl) {
+                showStatus('Please enter an RSS URL', 'error');
+                return;
+            }
+
+            if (!authToken) {
+                showStatus('Please login first', 'error');
+                return;
+            }
+
+            // Show loading state
+            const importBtn = document.getElementById('importBtn');
+            importBtn.disabled = true;
+            importBtn.textContent = '🔄 Importing...';
+            showStatus('🔄 Processing RSS feed...', 'loading');
+
+            try {
+                const response = await fetch(`${API_BASE}/import-rss/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        rss_url: rssUrl,
+                        domain: domain
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showStatus(`✅ Successfully imported! Processed: ${data.processed}, Skipped: ${data.skipped}`, 'success');
+                    updateStats(data.processed, data.skipped);
+                    displayBlogs(data.blogs);
+                } else {
+                    showStatus(`❌ Error: ${data.error || 'Import failed'}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Network error: ${error.message}`, 'error');
+            } finally {
+                // Reset button
+                importBtn.disabled = false;
+                importBtn.textContent = '📥 Import RSS Feed';
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function updateStats(processed, skipped) {
+            document.getElementById('processedCount').textContent = processed;
+            document.getElementById('skippedCount').textContent = skipped;
+            document.getElementById('totalCount').textContent = processed + skipped;
+        }
+
+        function displayBlogs(blogs) {
+            const previewContent = document.getElementById('previewContent');
+            
+            if (!blogs || blogs.length === 0) {
+                previewContent.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 50px;">
+                        <h4>📝 No New Blogs</h4>
+                        <p>All articles were already in the database or couldn't be processed.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const blogsHTML = blogs.map(blog => `
+                <div class="blog-preview">
+                    <div class="blog-title">${escapeHtml(blog.title)}</div>
+                    <div class="blog-meta">
+                        <span>👤 ${escapeHtml(blog.writer || 'Unknown')}</span>
+                        <span class="blog-domain">${escapeHtml(blog.domain)}</span>
+                    </div>
+                    ${blog.blog_link ? `
+                        <div class="blog-link">
+                            <a href="${escapeHtml(blog.blog_link)}" target="_blank">🔗 Read Original Article</a>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            previewContent.innerHTML = `
+                <h4>🎉 Successfully Imported Blogs:</h4>
+                ${blogsHTML}
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-focus on RSS URL input
+        document.getElementById('rssUrl').focus();
+
+        // Handle Enter key in auth inputs
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Handle Enter key in RSS URL input
+        document.getElementById('rssUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('importBtn').disabled) {
+                importRSSFeed();
+            }
+        });
+    </script>
+</body>
+</html>
