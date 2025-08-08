@@ -15,6 +15,7 @@ applyTo: '**'
 - Tech stack: React, Vite, Tailwind, TypeScript
 - Architecture patterns: Component-based
 - Key requirements: GitHub integration, branch management
+- Removed favicon.ico from public directory to eliminate browser tab icon (August 8, 2025)
 
 ## Coding Patterns
 - Preferred patterns and practices: Modular, clean code
@@ -27,4 +28,5 @@ applyTo: '**'
 - Actions: Memory file created and updated for GitHub integration
 
 ## Notes
+- If browser still shows the icon, clear cache or restart browser to verify removal.
 - Next steps: Set up remote, ensure 'test' branch, commit, and push
