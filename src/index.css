@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ddc-web Design System — HSL-only tokens */
+
+@layer base {
+  :root {
+    /* Core palette */
+    --background: 0 0% 0%;            /* Black */
+    --foreground: 210 20% 98%;        /* Off-white for readability */
+
+    --card: 0 0% 0%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 51 100% 50%;           /* Yellow (Gold) */
+    --primary-foreground: 0 0% 0%;    /* Black text on yellow */
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 0 0% 14%;
+    --accent-foreground: 51 100% 55%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 51 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar (unused now but kept aligned) */
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 51 100% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 51 100% 50%;
+
+    /* Brand surfaces & effects */
+    --glass-surface: 0 0% 100%;      /* used with alpha */
+    --glass-border: 51 100% 50%;     /* used with alpha */
+
+    /* Gradients & shadows */
+    --gradient-primary: linear-gradient(135deg, hsl(51 100% 50% / 0.95), hsl(51 100% 60% / 0.95));
+    --shadow-elegant: 0 10px 30px -12px hsl(51 100% 50% / 0.35);
+    --shadow-glow: 0 0 40px hsl(51 100% 60% / 0.35);
+  }
+
+  .dark {
+    /* Keep dark the same for a bold tech look */
+    --background: 0 0% 0%;
+    --foreground: 210 20% 98%;
+
+    --card: 0 0% 0%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 51 100% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 0 0% 14%;
+    --accent-foreground: 51 100% 55%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 51 100% 50%;
+
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 51 100% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 51 100% 50%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  html, body { height: 100%; }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01" on, "liga" on;
+  }
+
+  h1, h2, h3, h4 { @apply text-foreground; }
+}
+
+@layer components {
+  /* Glassmorphism utility based on design tokens */
+  .glass {
+    background-color: hsl(var(--glass-surface) / 0.06);
+    border: 1px solid hsl(var(--glass-surface) / 0.12);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    box-shadow: var(--shadow-elegant);
+  }
+
+  /* Hero button gradient variant (used by Button variant "hero") */
+  .btn-hero {
+    background-image: var(--gradient-primary);
+    color: hsl(var(--primary-foreground));
+    border: 1px solid hsl(var(--glass-surface) / 0.14);
+    box-shadow: var(--shadow-glow);
+  }
+  .btn-hero:hover {
+    filter: brightness(1.05);
+  }
+
+  /* Interactive helpers */
+  .story-link { position: relative; display: inline-block; }
+  .story-link::after {
+    content: "";
+    position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+    transform: scaleX(0); transform-origin: bottom right;
+    background: hsl(var(--primary)); transition: transform 300ms ease;
+  }
+  .story-link:hover::after { transform: scaleX(1); transform-origin: bottom left; }
+
+  .hover-scale { transition: transform 200ms ease; }
+  .hover-scale:hover { transform: translateY(-1px) scale(1.02); }
+}
