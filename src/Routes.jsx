@@ -1,12 +1,16 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Portfolio from "./pages/Portfolio";
-import Blog from "./pages/Blog";
-import Contact from "./pages/Contact";
+import { createBrowserRouter } from "react-router-dom";
+import App from "./App";
+import { SignInModal } from "./components/auth/SignInModal";
 
-<Router>
-  <Routes>
-    <Route path="/portfolio" element={<Portfolio />} />
-    <Route path="/blog" element={<Blog />} />
-    <Route path="/contact" element={<Contact />} />
-  </Routes>
-</Router>
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+  },
+  {
+    path: "/signIn",
+    element: (
+      <SignInModal isOpen={true} onClose={() => (window.location.href = "/")} />
+    ),
+  },
+]);
