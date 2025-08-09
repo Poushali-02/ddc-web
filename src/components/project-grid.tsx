@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Project } from "../types/project";
 import { ProjectCard } from "./project-card";
 import { Button } from "./ui/button";
@@ -7,6 +8,7 @@ interface ProjectGridProps {
 }
 
 export function ProjectGrid({ projects }: ProjectGridProps) {
+  const navigate = useNavigate();
   return (
     <div className="mt-32">
       <div className="bg-gray-900/50 backdrop-blur rounded-2xl border border-yellow-500/20 p-8">
@@ -25,7 +27,7 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
           </div>
 
           <div className="text-center">
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-2">
+            <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-2" onClick={() => navigate("/projects")}>
               View All Projects
             </Button>
           </div>
