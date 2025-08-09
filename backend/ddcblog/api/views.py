@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.utils import timezone
 from blogs.models import Blog, RSSFeed
+from accounts.models import UserProfile
 from .serializers import UserRegistrationSerializer, BlogSerializer, RSSFeedSerializer
 from .rss_processor import RSSProcessor
 from django.db import models
@@ -20,11 +22,20 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
+        
+        # Get the user profile that was created
+        user_profile = UserProfile.objects.get(user=user)
+        
         return Response({
             'user': {
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'bio': user_profile.bio,
+                'preferred_domains': user_profile.preferred_domains,
+                'can_import_rss': user_profile.can_import_rss,
             },
             'token': token.key
         }, status=status.HTTP_201_CREATED)
@@ -38,11 +49,20 @@ def login_view(request):
     user = authenticate(username=username, password=password)
     if user:
         token, created = Token.objects.get_or_create(user=user)
+        
+        # Get or create user profile
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        
         return Response({
             'user': {
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'bio': user_profile.bio,
+                'preferred_domains': user_profile.preferred_domains,
+                'can_import_rss': user_profile.can_import_rss,
             },
             'token': token.key
         })
@@ -107,6 +127,68 @@ def import_rss_feed(request):
         result = processor.process_feed(rss_url, domain, request.user)
         
         return Response(result)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def sync_all_feeds(request):
+    """Sync all RSS feeds belonging to the authenticated user"""
+    try:
+        user_feeds = RSSFeed.objects.filter(added_by=request.user, is_active=True)
+        
+        if not user_feeds.exists():
+            return Response({'message': 'No RSS feeds to sync'}, status=status.HTTP_200_OK)
+        
+        processor = RSSProcessor()
+        results = []
+        total_new_blogs = 0
+        
+        for feed in user_feeds:
+            try:
+                result = processor.process_feed(
+                    rss_url=feed.url,
+                    domain_override=feed.domain,
+                    user=request.user
+                )
+                
+                if result.get('success'):
+                    new_blogs = result.get('processed', 0)
+                    total_new_blogs += new_blogs
+                    
+                    # Update last_fetched time
+                    feed.last_fetched = timezone.now()
+                    feed.save()
+                    
+                    results.append({
+                        'feed_url': feed.url,
+                        'domain': feed.domain,
+                        'new_blogs': new_blogs,
+                        'status': 'success'
+                    })
+                else:
+                    results.append({
+                        'feed_url': feed.url,
+                        'domain': feed.domain,
+                        'error': result.get('error'),
+                        'status': 'error'
+                    })
+                    
+            except Exception as e:
+                results.append({
+                    'feed_url': feed.url,
+                    'domain': feed.domain,
+                    'error': str(e),
+                    'status': 'error'
+                })
+        
+        return Response({
+            'success': True,
+            'total_feeds_synced': len(user_feeds),
+            'total_new_blogs': total_new_blogs,
+            'results': results
+        })
+        
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

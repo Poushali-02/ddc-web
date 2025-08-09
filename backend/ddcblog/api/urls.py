@@ -14,6 +14,7 @@ urlpatterns = [
     
     # RSS
     path('import-rss/', views.import_rss_feed, name='import-rss'),
+    path('sync-feeds/', views.sync_all_feeds, name='sync-feeds'),
     
     path('projects/', views.get_all_projects, name='all-projects'),  # GET /projects
     path('projects/<str:domain>/', views.get_projects_by_domain, name='projects-by-domain'),  # GET /projects/<domain>
