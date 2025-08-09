@@ -9,18 +9,19 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(useGSAP);
 
-
 function App() {
   useGSAP(() => {
-    gsap.fromTo(".main-text h1",
+    gsap.fromTo(
+      ".main-text h1",
       { y: 50, opacity: 0 },
       { y: 0, opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
-    )
-    gsap.fromTo(".main-text p",
+    );
+    gsap.fromTo(
+      ".main-text p",
       { opacity: 0 },
       { opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
-    )
-  })
+    );
+  });
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -80,9 +81,10 @@ function App() {
                       DDC-BuiltOnDot
                     </span>
                   </h1>
-                  <p className="">Discover, Read, and Celebrate What Our Community Builds.</p>
+                  <p className="">
+                    Discover, Read, and Celebrate What Our Community Builds.
+                  </p>
                 </div>
-
               </div>
             </div>
           </div>
