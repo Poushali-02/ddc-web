@@ -1,24 +1,33 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 
+type Project = {
+  domain?: string;
+  [key: string]: any;
+};
+
 const Projects = () => {
-    const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<string[]>([]);
 
-    useEffect(() => {
-        axios.get("http://127.0.0.1:5000/projects")
-            .then(res => setProjects(res.data))
-            .catch(err => console.error(err));
-    }, []);
-    return (
-        <div>
-            <h1>Projects</h1>
-            <ul>
-                {projects.map((p, index) => (
-                    <li key={index}>{p.domain || JSON.stringify(p)}</li>
-                ))}
-            </ul>
-        </div>
-    );
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:5000/projects")
+      .then((res) =>{
+        console.log(res.data); // { count of domains: 6, domains: [...] }
+        setProjects(res.data.domains || []);
+    })
+      .catch((err) => console.error(err));
+  }, []);
+  return (
+    <div>
+      <h1>Domains</h1>
+      <ul>
+        {projects.map((domain, index) => (
+          <li key={index}>{domain}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-}
-
-export default Projects
+export default Projects;
