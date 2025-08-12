@@ -1,11 +1,10 @@
 import feedparser
 import requests
+from blogs.models import Blog
+from django.utils import timezone
 
 class RSSProcessor:
-    def __init__(self, app=None, db=None, blog_model=None):
-        self.app = app
-        self.db = db
-        self.Blog = blog_model
+    def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -29,7 +28,7 @@ class RSSProcessor:
             return None
     
     def extract_content(self, entry):
-        """Extract and clean content from RSS entry"""
+        """Extract raw HTML content from RSS entry"""
         content = ""
         
         # Try different content fields
@@ -40,13 +39,14 @@ class RSSProcessor:
         elif hasattr(entry, 'summary') and entry.summary:
             content = entry.summary
         
-        
+        # Return raw HTML content without any processing
         return content
     
     def extract_blog_link(self, entry):
+        """Extract the blog link from RSS entry"""
         blog_link = ""
         
-    # Try different link fields
+        # Try different link fields
         if hasattr(entry, 'link') and entry.link:
             blog_link = entry.link
         elif hasattr(entry, 'links') and entry.links:
@@ -100,11 +100,8 @@ class RSSProcessor:
         
         return author
     
-    def process_rss_feed(self, rss_url, domain_override=None):
-        """Process entire RSS feed and save to database"""
-        if not self.app or not self.db or not self.Blog:
-            return {"error": "RSS Processor not properly initialized"}
-            
+    def process_feed(self, rss_url, domain_override, user):
+        """Process entire RSS feed and save to database (Django version)"""
         feed = self.fetch_and_parse_rss(rss_url)
         
         if not feed:
@@ -113,58 +110,54 @@ class RSSProcessor:
         processed_blogs = []
         skipped_blogs = []
         
-        with self.app.app_context():
-            for entry in feed.entries:
-                try:
-                    # Extract data
-                    title = getattr(entry, 'title', 'Untitled')
-                    content = self.extract_content(entry)
-                    domain = domain_override or self.extract_tags(entry)
-                    writer = self.extract_author(entry, feed.feed.get('title', 'RSS Feed'))
-                    blog_link = self.extract_blog_link(entry)
-                    
-                    # Skip if essential data is missing
-                    if not title or not content:
-                        skipped_blogs.append(f"Skipped: {title} (missing content)")
-                        continue
-                    
-                    # Check if blog already exists (by title and domain)
-                    existing_blog = self.Blog.query.filter_by(title=title, domain=domain).first()
-                    if existing_blog:
-                        skipped_blogs.append(f"Already exists: {title}")
-                        continue
-                    
-                    # Create new blog
-                    blog = self.Blog(
-                        title=title,
-                        content=content,
-                        domain=domain,
-                        writer=writer,
-                        blog_link=blog_link if blog_link else None
-                    )
-                    
-                    self.db.session.add(blog)
-                    processed_blogs.append({
-                        'title': title,
-                        'domain': domain,
-                        'writer': writer,
-                        'blog_link': blog_link if blog_link else None,
-                    })
-                    
-                except Exception as e:
-                    skipped_blogs.append(f"Error processing entry: {str(e)}")
-                    continue
-            
-            # Commit all changes
+        for entry in feed.entries:
             try:
-                self.db.session.commit()
-                return {
-                    'success': True,
-                    'processed': len(processed_blogs),
-                    'skipped': len(skipped_blogs),
-                    'blogs': processed_blogs,
-                    'skipped_details': skipped_blogs
-                }
+                # Extract data
+                title = getattr(entry, 'title', 'Untitled')
+                content = self.extract_content(entry)
+                domain = domain_override or self.extract_tags(entry)
+                writer = self.extract_author(entry, feed.feed.get('title', 'RSS Feed'))
+                blog_link = self.extract_blog_link(entry)
+                
+                # Skip if essential data is missing
+                if not title or not content:
+                    skipped_blogs.append(f"Skipped: {title} (missing content)")
+                    continue
+                
+                # Check if blog already exists (Django ORM syntax)
+                existing_blog = Blog.objects.filter(title=title, domain=domain).first()
+                if existing_blog:
+                    skipped_blogs.append(f"Already exists: {title}")
+                    continue
+                
+                # Create new blog (Django ORM syntax)
+                blog = Blog.objects.create(
+                    title=title,
+                    content=content,
+                    domain=domain,
+                    writer=writer,
+                    blog_link=blog_link if blog_link else None,
+                    created_by=user
+                )
+                
+                processed_blogs.append({
+                    'id': blog.id,
+                    'title': title,
+                    'domain': domain,
+                    'writer': writer,
+                    'blog_link': blog_link if blog_link else None,
+                })
+                
             except Exception as e:
-                self.db.session.rollback()
-                return {'error': f'Database error: {str(e)}'}
+                skipped_blogs.append(f"Error processing entry: {str(e)}")
+                continue
+        
+        # Return results
+        return {
+            'success': True,
+            'processed': len(processed_blogs),
+            'skipped': len(skipped_blogs),
+            'blogs': processed_blogs,
+            'skipped_details': skipped_blogs,
+            'feed_title': feed.feed.get('title', 'Unknown Feed')
+        }
