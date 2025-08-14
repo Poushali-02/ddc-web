@@ -13,20 +13,22 @@ class RSSProcessor:
     def fetch_and_parse_rss(self, rss_url):
         """Fetch RSS feed and parse it"""
         try:
+            print(f"[DEBUG] Fetching RSS feed from URL: {rss_url}")
             response = self.session.get(rss_url, timeout=10)
+            print(f"[DEBUG] HTTP status code: {response.status_code}")
             response.raise_for_status()
             
             # Parse RSS feed
             feed = feedparser.parse(response.content)
+            print(f"[DEBUG] Parsed feed entries count: {len(feed.entries)}")
             
             if feed.bozo:
-                print(f"Warning: RSS feed has issues: {feed.bozo_exception}")
+                print(f"[WARNING] RSS feed has issues: {feed.bozo_exception}")
             
             return feed
         except Exception as e:
-            print(f"Error fetching RSS feed: {e}")
+            print(f"[ERROR] Error fetching RSS feed: {e}")
             return None
-    
     def extract_content(self, entry):
         """Extract raw HTML content from RSS entry"""
         content = ""

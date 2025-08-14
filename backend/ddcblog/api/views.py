@@ -262,3 +262,5 @@ def get_specific_project(request, domain, blog_id):
         return Response(serializer.data)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+

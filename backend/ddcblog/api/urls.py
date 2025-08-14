@@ -20,3 +20,6 @@ urlpatterns = [
     path('projects/<str:domain>/', views.get_projects_by_domain, name='projects-by-domain'),  # GET /projects/<domain>
     path('projects/<str:domain>/<int:blog_id>/', views.get_specific_project, name='specific-project'),  # GET /projects/<domain>/<id>
 ]
+
+
+# add post route for creating projects manually
