@@ -11,6 +11,17 @@ node_modules
 dist
 dist-ssr
 *.local
+.vite
+build/
+coverage/
+.coverage
+
+# Environment and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Editor directories and files
 .vscode/*
@@ -25,5 +36,16 @@ dist-ssr
 venv/
 __pycache__/
 instance/
-.env
 db.sqlite3
+backend/instance/
+*.pyc
+*.pyo
+*.pyd
+.Python
+backend/__pycache__/
+backend/.pytest_cache/
+backend/*.log
+*.sqlite3
+.coverage
+htmlcov/
+frontend/test.js
