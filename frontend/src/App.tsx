@@ -1,12 +1,13 @@
 import { Search, Sun } from "lucide-react";
 import { Button } from "./components/ui/button";
-import projectsData from "./data/projects.json";
 import { ProjectGrid } from "./components/project-grid";
 import { Spotlight } from "./components/ui/spotlight-new";
 import WebpageCards from "./components/webpage-card";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 gsap.registerPlugin(useGSAP);
 
@@ -24,6 +25,30 @@ function App() {
       { opacity: 1, duration: 2, ease: "power2.inOut", stagger: 0.3 }
     );
   });
+
+  // --- New: Fetch latest blogs from backend ---
+  const [latestProjects, setLatestProjects] = useState<any[]>([]);
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/blogs/?limit=3")
+      .then((res) => {
+        // Map backend blogs to Project type
+        const mapped = (res.data.results || res.data || []).slice(0, 3).map((blog: any) => ({
+          id: String(blog.id),
+          title: blog.title,
+          description: blog.content?.replace(/<[^>]*>/g, "").slice(0, 120) + "...",
+          domain: [blog.domain],
+          technologies: [blog.writer || "Blog"],
+          previewImage: (() => {
+            const match = blog.content?.match(/<img.*?src=\"(.*?)\".*?>/);
+            return match ? match[1] : undefined;
+          })(),
+        }));
+        setLatestProjects(mapped);
+      })
+      .catch(() => setLatestProjects([]));
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -99,8 +124,8 @@ function App() {
           </div>
         </div>
 
-        {/* Latest Projects Section */}
-        <ProjectGrid projects={projectsData.projects} />
+        {/* Latest Projects Section (real blogs) */}
+        <ProjectGrid projects={latestProjects.length ? latestProjects : []} />
 
         <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mt-10 p-6">
           <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
