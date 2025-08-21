@@ -124,7 +124,7 @@ const BlogDetail = () => {
           <div className="bg-gray-900/50 backdrop-blur rounded-2xl border border-yellow-500/20 p-8">
             <div
               className="text-gray-300 leading-relaxed blog-content overflow-hidden"
-              style={{ wordWrap: 'break-word', maxWidth: '100%' }}
+              style={{ wordWrap: "break-word", maxWidth: "100%" }}
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
 
