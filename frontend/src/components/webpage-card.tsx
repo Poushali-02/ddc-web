@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import * as React from "react";
 import { PinContainer } from "./ui/3d-pin";
 
 const socialLinks = [
@@ -23,7 +23,7 @@ const socialLinks = [
         <path d="M9 18c-4.51 2-5-2-7-2" />
       </svg>
     ),
-    url: "https://www.devdotcom.in/",
+    url: "https://github.com/DevDotCommunity",
   },
   {
     title: "DDC Website",
