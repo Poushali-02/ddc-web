@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Define a Blog type that matches your backend response
 type Blog = {
@@ -18,6 +18,7 @@ type Blog = {
 const Projects = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Add this line
 
   useEffect(() => {
     // Fetch all blogs from Django backend
@@ -54,6 +55,13 @@ const Projects = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto pt-32 px-4">
+        {/* Go Back Button */}
+        <button
+          className="mb-6 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded transition-colors"
+          onClick={() => navigate("/")}
+        >
+          ← Go Back
+        </button>
         <div className="bg-gray-900/50 backdrop-blur rounded-2xl border border-yellow-500/20 p-8">
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
