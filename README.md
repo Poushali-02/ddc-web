@@ -1,54 +1,107 @@
-# React + TypeScript + Vite
+# DDC-Web Fullstack Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern fullstack web application with a Django backend and a React + TypeScript + Vite frontend.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Structure
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+├── backend/         # Django backend (API, authentication, RSS import, admin)
+│   ├── ddcblog/     # Django project root
+│   ├── ...          # Django apps: accounts, blogs, api
+│   ├── requirements.txt
+│   └── rss_importer.html  # Standalone API demo page
+├── frontend/        # React + Vite + Tailwind frontend
+│   ├── src/         # React source code
+│   ├── public/
+│   ├── index.html
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── ...
+├── .gitignore
+├── README.md
+└── ...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Features
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+- **Backend (Django 5.x):**
+  - User registration, login
+  - Blog CRUD (create, read, update, delete)
+  - RSS feed import and sync (with feedparser)
+  - Domain/project statistics endpoints
+  - Django admin for user and blog management
+  - CORS enabled for frontend-backend integration
+
+- **Frontend (React + Vite + Tailwind):**
+  - Modern SPA with TypeScript
+  - Authentication (register/login/logout)
+  - Blog listing, detail, and domain/project views
+  - RSS import UI
+  - API testing utilities
+  - Responsive, accessible UI
+
+---
+
+## Getting Started
+
+### 1. Backend (Django)
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cd ddcblog
+python manage.py migrate
+python manage.py createsuperuser  # Optional: create admin user
+python manage.py runserver
 ```
+
+- The API will be available at `http://localhost:8000/`
+- Admin: `http://localhost:8000/admin/`
+
+### 2. Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+- The frontend will be available at `http://localhost:5173/` (default Vite port)
+
+---
+
+## API Endpoints (Backend)
+
+- `POST   /register/`         — Register user
+- `POST   /login/`            — Login (get token)
+- `GET    /blogs/`            — List blogs
+- `GET    /blogs/<id>/`       — Blog detail
+- `GET    /domains/`          — List all domains
+- `GET    /projects/`         — Domain/project stats
+- `GET    /projects/<domain>/` — Blogs by domain
+- `GET    /projects/<domain>/<id>/` — Blog by domain & id
+
+---
+
+## Development Notes
+
+- All environment variables and secrets should be stored in `.env` files (see `.gitignore`).
+- Python bytecode, cache, and build artifacts are ignored by default.
+- To run the standalone API demo, open `backend/rss_importer.html` in your browser.
+- For production, build the frontend with `npm run build` and serve the output as needed.
+
+---
+
+## Credits
+
+- [Django](https://www.djangoproject.com/)
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
