@@ -36,12 +36,6 @@ const BlogDetail = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Function to extract the first image URL from content
-  const extractImageUrl = (content: string): string | undefined => {
-    const imgRegex = /<img.*?src="(.*?)".*?>/;
-    const match = content.match(imgRegex);
-    return match ? match[1] : undefined;
-  };
 
   useEffect(() => {
     if (!id) return;
