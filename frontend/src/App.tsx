@@ -6,7 +6,7 @@ import WebpageCards from "./components/webpage-card";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 gsap.registerPlugin(useGSAP);
@@ -28,6 +28,21 @@ function App() {
 
   // --- New: Fetch latest blogs from backend ---
   const [latestProjects, setLatestProjects] = useState<any[]>([]);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Linear scroll progress bar logic
+  const handleScroll = useCallback(() => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    setScrollProgress(progress);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/blogs/?limit=3")
@@ -51,6 +66,17 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Linear scroll progress bar */}
+      <div style={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 50 }}>
+        <div
+          style={{
+            height: "4px",
+            width: `${scrollProgress}%`,
+            background: "linear-gradient(90deg, #facc15 0%, #f59e42 100%)",
+            transition: "width 0.2s cubic-bezier(0.4,0,0.2,1)",
+          }}
+        />
+      </div>
       {/* Header */}
       <header className="border-b border-yellow-500/20 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
         <div className="container mx-auto px-4 py-4">
