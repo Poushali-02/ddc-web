@@ -1,23 +1,28 @@
-# DDC-Web Fullstack Project
 
-A modern fullstack web application with a Django backend and a React + TypeScript + Vite frontend.
+# DDC-Web: Automated Domain-Based Blog Aggregator
+
+Get all the latest tutorial blogs, automatically imported and categorized by domain, at [Projects by Devdotcom](https://projects.devdotcom.in)
+
+---
+
+## Project Overview
+
+**DDC-Web** is a fullstack project that automatically imports blogs from RSS feeds, categorizes them by domain, and displays them in a modern, filterable frontend. All manual blog creation and authentication have been removed—everything is fully automated and public.
 
 ---
 
 ## Project Structure
 
 ```
-├── backend/         # Django backend (API, authentication, RSS import, admin)
-│   ├── ddcblog/     # Django project root
-│   ├── ...          # Django apps: accounts, blogs, api
+├── backend/         # Django backend (API, RSS import, admin, scripts)
+│   ├── ddcblog/     # Django project root & apps (api, blogs)
 │   ├── requirements.txt
-│   └── rss_importer.html  # Standalone API demo page
+│   └── ...
 ├── frontend/        # React + Vite + Tailwind frontend
 │   ├── src/         # React source code
 │   ├── public/
 │   ├── index.html
 │   ├── package.json
-│   ├── tailwind.config.js
 │   └── ...
 ├── .gitignore
 ├── README.md
@@ -29,19 +34,17 @@ A modern fullstack web application with a Django backend and a React + TypeScrip
 ## Features
 
 - **Backend (Django 5.x):**
-  - User registration, login
-  - Blog CRUD (create, read, update, delete)
-  - RSS feed import and sync (with feedparser)
-  - Domain/project statistics endpoints
-  - Django admin for user and blog management
-  - CORS enabled for frontend-backend integration
+  - Automated RSS feed import and sync (feedparser)
+  - Domain-based blog categorization and filtering
+  - No authentication or manual blog creation—fully automated
+  - Django admin for feed/domain management
+  - REST API for blogs, domains, and stats
+  - Scripts for bulk feed creation and scheduled sync
 
 - **Frontend (React + Vite + Tailwind):**
   - Modern SPA with TypeScript
-  - Authentication (register/login/logout)
-  - Blog listing, detail, and domain/project views
-  - RSS import UI
-  - API testing utilities
+  - Blog listing, detail, and domain filtering
+  - Scroll progress bar on all pages
   - Responsive, accessible UI
 
 ---
@@ -53,16 +56,23 @@ A modern fullstack web application with a Django backend and a React + TypeScrip
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 cd ddcblog
 python manage.py migrate
-python manage.py createsuperuser  # Optional: create admin user
 python manage.py runserver
+python manage.py import_feed
 ```
 
-- The API will be available at `http://localhost:8000/`
+- API: `http://localhost:8000/`
 - Admin: `http://localhost:8000/admin/`
+
+#### Automated RSS Import & Sync
+
+- **Import/sync blogs for all domains:**
+  - Run: use management command: `python manage.py import_feed`
+- **Schedule sync (Windows Task Scheduler):**
+  - Schedule `import_feed.py` to run everyday
 
 ### 2. Frontend (React)
 
@@ -72,29 +82,34 @@ npm install
 npm run dev
 ```
 
-- The frontend will be available at `http://localhost:5173/` (default Vite port)
+- Frontend: `http://localhost:5173/`
 
 ---
 
 ## API Endpoints (Backend)
 
-- `POST   /register/`         — Register user
-- `POST   /login/`            — Login (get token)
-- `GET    /blogs/`            — List blogs
+- `GET    /blogs/`            — List all blogs
 - `GET    /blogs/<id>/`       — Blog detail
 - `GET    /domains/`          — List all domains
 - `GET    /projects/`         — Domain/project stats
 - `GET    /projects/<domain>/` — Blogs by domain
-- `GET    /projects/<domain>/<id>/` — Blog by domain & id
 
 ---
 
-## Development Notes
+## Scripts & Automation
 
-- All environment variables and secrets should be stored in `.env` files (see `.gitignore`).
-- Python bytecode, cache, and build artifacts are ignored by default.
-- To run the standalone API demo, open `backend/rss_importer.html` in your browser.
-- For production, build the frontend with `npm run build` and serve the output as needed.
+- **Bulk RSSFeed creation:** `backend/ddcblog/blogs/add_feeds_by_domain.py`
+- **Import all feeds:** `python manage.py import_feed`
+- **Schedule automation:** Use Windows Task Scheduler to run import/sync scripts every 2 days
+
+---
+
+## Development & Deployment Notes
+
+- No authentication or manual blog creation—everything is automated
+- All environment variables/secrets in `.env` (see `.gitignore`)
+- For production, build frontend with `npm run build` and serve the output
+- Python bytecode, cache, and build artifacts are ignored by default
 
 ---
 
