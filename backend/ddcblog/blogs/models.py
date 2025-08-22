@@ -3,14 +3,14 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Blog(models.Model):
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    domain = models.CharField(max_length=100)
-    writer = models.CharField(max_length=100)
+    title = models.CharField(max_length=200, null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
+    domain = models.CharField(max_length=100, null=True, blank=True)
+    writer = models.CharField(max_length=100, null=True, blank=True)
     blog_link = models.URLField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blogs')
-    is_published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blogs', null=True, blank=True)
+    is_published = models.BooleanField(default=True, null=True, blank=True)
     
     class Meta:
         ordering = ['-created_at']
