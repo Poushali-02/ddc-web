@@ -105,35 +105,46 @@ class RSSProcessor:
     def process_feed(self, rss_url, domain_override, user):
         """Process entire RSS feed and save to database (Django version)"""
         feed = self.fetch_and_parse_rss(rss_url)
-        
+
         if not feed:
             return {"error": "Failed to fetch RSS feed"}
-        
+
         processed_blogs = []
         skipped_blogs = []
-        
+
         for entry in feed.entries:
             try:
                 # Extract data
                 title = getattr(entry, 'title', 'Untitled')
                 content = self.extract_content(entry)
-                domain = domain_override or self.extract_tags(entry)
+                # Extract tags (list) and domain (first tag or override)
+                tags = []
+                try:
+                    tags = self.extract_tags(entry, default_domain=domain_override or "General")
+                except Exception:
+                    tags = [domain_override or "General"]
+                if isinstance(tags, str):
+                    tags = [tags]
+                domain = domain_override or (tags[0] if tags else "General")
                 writer = self.extract_author(entry, feed.feed.get('title', 'RSS Feed'))
                 blog_link = self.extract_blog_link(entry)
-                
+
                 # Skip if essential data is missing
                 if not title or not content:
                     skipped_blogs.append(f"Skipped: {title} (missing content)")
                     continue
-                
-                # Check if blog already exists (Django ORM syntax)
-                existing_blog = Blog.objects.filter(title=title, domain=domain).first()
-                if existing_blog:
+
+                # Check if blog already exists by blog_link (preferred) or title/domain
+                if blog_link:
+                    exists = Blog.objects.filter(blog_link=blog_link).exists()
+                else:
+                    exists = Blog.objects.filter(title=title, domain=domain).exists()
+                if exists:
                     skipped_blogs.append(f"Already exists: {title}")
                     continue
-                
+
                 # Create new blog (Django ORM syntax)
-                blog = Blog.objects.create(
+                blog_kwargs = dict(
                     title=title,
                     content=content,
                     domain=domain,
@@ -141,19 +152,24 @@ class RSSProcessor:
                     blog_link=blog_link if blog_link else None,
                     created_by=user
                 )
-                
+                # If Blog model has a tags field, save all tags as comma-separated string
+                if hasattr(Blog, 'tags'):
+                    blog_kwargs['tags'] = ", ".join(tags)
+                blog = Blog.objects.create(**blog_kwargs)
+
                 processed_blogs.append({
                     'id': blog.id,
                     'title': title,
                     'domain': domain,
                     'writer': writer,
                     'blog_link': blog_link if blog_link else None,
+                    'tags': tags,
                 })
-                
+
             except Exception as e:
                 skipped_blogs.append(f"Error processing entry: {str(e)}")
                 continue
-        
+
         # Return results
         return {
             'success': True,

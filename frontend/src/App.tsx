@@ -5,14 +5,14 @@ import { Spotlight } from "./components/ui/spotlight-new";
 import WebpageCards from "./components/webpage-card";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 gsap.registerPlugin(useGSAP);
 
 function App() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   useGSAP(() => {
     gsap.fromTo(
       ".main-text h1",
@@ -111,13 +111,6 @@ function App() {
                   className="text-gray-300 hover:text-yellow-400"
                 >
                   <Sun className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/signIn")}
-                  className="text-gray-300 hover:text-yellow-400"
-                >
-                  Sign in
                 </Button>
               </div>
             </nav>
