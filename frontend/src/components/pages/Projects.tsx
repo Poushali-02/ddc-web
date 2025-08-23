@@ -11,7 +11,6 @@ type Blog = {
   writer: string;
   blog_link?: string;
   created_at: string;
-  created_by?: string;
   is_published?: boolean;
 };
 
