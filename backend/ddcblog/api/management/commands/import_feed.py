@@ -5,15 +5,7 @@ from django.utils import timezone
 
 
 domains = [
-    'Web development',
-    'javascript',
-    'Technology',
-    'Artificial Intelligence',
-    'Machine Learning',
-    'Deep Learning',
-    'programming',
-    'javascript-tips',
-    'tech'
+    'projects'
 ]
 
 class Command(BaseCommand):
